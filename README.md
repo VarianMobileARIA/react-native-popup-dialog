@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/jacklam718/react-native-popup-dialog.svg?branch=master)](https://travis-ci.org/jacklam718/react-native-popup-dialog)
+[![npm](https://img.shields.io/npm/dm/react-native-popup-dialog.svg)]()
+[![npm](https://img.shields.io/npm/v/react-native-popup-dialog.svg)]()
+
 ## React Native Popup Dialog
 React Native Popup Dialog for iOS & Android.
 
@@ -24,20 +28,20 @@ yarn add react-native-popup-dialog
 
 ## Exposed Modules
 
-1. Dialog
-2. PopupDialog
-3. DialogButton
-4. DialogTitle
-5. Overlay
-6. Animation
-7. FadeInAnimation
-8. ScaleAnimation
-9. SlideAnimation
-10. PopupDialogType
-11. DialogType
-12. DialogButtonType
-13. DialogTitleType
-14. OverlayType
+* Dialog
+* PopupDialog
+* DialogButton
+* DialogTitle
+* Overlay
+* Animation
+* FadeAnimation
+* ScaleAnimation
+* SlideAnimation
+* PopupDialogType
+* DialogType
+* DialogButtonType
+* DialogTitleType
+* OverlayType
 
 ## Examples
 [Example](https://github.com/jacklam718/react-native-popup-dialog/blob/master/popup-dialog-example/PopupDialogExample.js)
@@ -116,51 +120,51 @@ this.popupDialog.dismiss(() => {
 ### PopupDialog
 | Prop | Type | Default | Note |
 |---|---|---|---|
-| `dialogTitle` | `React Element` | | You can pass a `DialogTitle` component or pass a `View` for customizing titlebar |
-| `width` | `Number` | Your device width | The Width of Dialog, you can use fixed width or use percentage
-| `height` | `Number` | 300 | The Width of Dialog, you can use fixed height or use percentage
-| `dialogAnimation` |  | `FadeInAnimation` | animation for dialog | |
-| `dialogStyle` | `Object` or `Number` | | | |
-| `animationDuration` | `Number` | `200` | | |
-| `overlayPointerEvents` | `String` | | Available option: `auto`, `none` |
-| `overlayBackgroundColor` | `String` | `#000` |
-| `overlayOpacity` | `Number` | `0.5` |
-| `dismissOnTouchOutside` | `Bool` | `true` | When touch overlay will dismiss dialog, but if `haveOverlay` is false then the `dismissOnTouchOutside` won't work| |
-| `dismissOnHardwareBackPress` | `Bool` | `true` | Only for Android | |
-| `haveOverlay` | `Bool` | `true` | If false won't show overlay while dialog show | |
-| `show` | `Bool` | `false` |  | |
-| `onShown` | `Function` | | You can pass shown function as a callback function, will call the function when dialog shown | |
-| `onDismissed` | `Function` | | You can pass onDismissed function as a callback function, will call the function when dialog dismissed | |
-| `actions` | `Array` | | Array of `DialogButton` component for example: ```[<DialogButton text="DISMISS", align="center" onPress={this.dismiss}/>]``` | |
+| `dialogTitle?` | `React Element` | | You can pass a `DialogTitle` component or pass a `View` for customizing titlebar |
+| `width?` | `Number` | Your device width | The Width of Dialog, you can use fixed width or use percentage
+| `height?` | `Number` | 300 | The Width of Dialog, you can use fixed height or use percentage
+| `dialogAnimation?` |  | `FadeAnimation` | animation for dialog | |
+| `dialogStyle?` | `any` | | | |
+| `animationDuration?` | `Number` | `200` | | |
+| `overlayPointerEvents?` | `String` | | Available option: `auto`, `none` |
+| `overlayBackgroundColor?` | `String` | `#000` |
+| `overlayOpacity?` | `Number` | `0.5` |
+| `dismissOnTouchOutside?` | `Bool` | `true` | When touch overlay will dismiss dialog, but if `haveOverlay?` is false then the `dismissOnTouchOutside` won't work| |
+| `dismissOnHardwareBackPress?` | `Bool` | `true` | Only for Android | |
+| `haveOverlay?` | `Bool` | `true` | If false won't show overlay while dialog show | |
+| `show?` | `Bool` | `false` |  | |
+| `onShown?` | `Function` | | You can pass shown function as a callback function, will call the function when dialog shown | |
+| `onDismissed?` | `Function` | | You can pass onDismissed function as a callback function, will call the function when dialog dismissed | |
+| `actions?` | `Array` | | Array of `DialogButton` component for example: ```[<DialogButton text="DISMISS", align="center" onPress={this.dismiss}/>]``` | |
 
 
 ### DialogTitle
 | Prop | Type | Default | Note |
 |---|---|---|---|
 | `title` | `String` | | | |
-| `titleStyle` | `Object` or `Number` | | | |
-| `titleTextStyle` | `Object` or `Number` | | | |
-| `titleAlign` | `String` | `center` | | |
-| `haveTitleBar` | `Bool` | `true` | | |
+| `titleStyle?` | `any` | | | |
+| `titleTextStyle?` | `any` | | | |
+| `titleAlign?` | `String` | `center` | | |
+| `haveTitleBar?` | `Bool` | `true` | | |
 
 
 ### DialogButton
 | Prop | Type | Default | Note |
 |---|---|---|---|
 | `text` | `String` | | | |
-| `align` | `String` | `center` | The position of the button. Available option: `left`, `center`, `right` | |
-| `onPress` | `Function` | | | |
-| `buttonStyle` | `Object` or `Number` | | | |
-| `textStyle` | `Object` or `Number` | | | |
-| `textContainerStyle` | `Object` or `Number` | | | |
-| `disabled` | `Boolean` | `false` | | |
-| `activeOpacity` | `Number` | | | |
+| `align?` | `String` | `center` | The position of the button. Available option: `left`, `center`, `right` | |
+| `onPress?` | `Function` | | | |
+| `buttonStyle?` | `any` | | | |
+| `textStyle?` | `any` | | | |
+| `textContainerStyle?` | `any` | | | |
+| `disabled?` | `Boolean` | `false` | | |
+| `activeOpacity?` | `Number` | | | |
 
 
 ## Animation
 ### Params for (*)Animation
 
-### FadeInAnimation
+### FadeAnimation
 | Param | Type | Default | Note |
 |---|---|---|---|
 | `toValue` | Number | 0 | |
