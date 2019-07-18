@@ -9,14 +9,22 @@ Another similar dialog component: [react-native-dialog-component](https://github
 
 Pull request are welcomed. Please follow [Airbnb JS Style Guide](https://github.com/airbnb/javascript)
 
-[Try it with Exponent](https://exp.host/@jacklam718/popup-dialog-example)
-<!-- ![Example](https://jacklam718.github.io/react-native-popup-dialog/resources/react-native-popup-dialog.gif) -->
-<img src="https://jacklam718.github.io/react-native-popup-dialog/resources/popup-dialog-scale-animation.gif" width="250" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://jacklam718.github.io/react-native-popup-dialog/resources/popup-dialog-slide-animation.gif" width="250" />
+#### How to thank me ?
+Just click on ⭐️ button 😘
 
+[Try it with Exponent](https://exp.host/@jacklam718/popup-dialog-example)<br>
+<img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/popup-dialog.png" width="220">
 <br>
+<br>
+<!-- ![Example](https://jacklam718.github.io/react-native-popup-dialog/resources/react-native-popup-dialog.gif) -->
+<span>
+  <img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/fade-animation.gif" width="220">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/scale-animation.gif" width="220">&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/slide-animation.gif" width="220">
+</span>
 
-<!-- ![Example](https://jacklam718.github.io/react-native-popup-dialog/resources/react-native-popup-dialog-demo.png) -->
-<img src="https://jacklam718.github.io/react-native-popup-dialog/resources/react-native-popup-dialog-demo.png" width="250">
+## BREAKING CHANGE
+Has a lot of backward incompatible changes in `v0.16.0`. Please, Read the Docs before upgrading to `v0.16.0`
 
 ## Installation
 
@@ -29,159 +37,284 @@ yarn add react-native-popup-dialog
 ## Exposed Modules
 
 * Dialog
-* PopupDialog
-* DialogButton
-* DialogTitle
 * Overlay
+* DialogButton
+* DialogContent
+* DialogTitle
+* DialogFooter
 * Animation
 * FadeAnimation
 * ScaleAnimation
 * SlideAnimation
-* PopupDialogType
-* DialogType
-* DialogButtonType
-* DialogTitleType
-* OverlayType
+* DialogProps
+* DialogFooterProps
+* DialogButtonProps
+* DialogTitleProps
+* DialogContentProps
+* OverlayProps
 
 ## Examples
-[Example](https://github.com/jacklam718/react-native-popup-dialog/blob/master/popup-dialog-example/PopupDialogExample.js)
+[Example](https://github.com/jacklam718/react-native-popup-dialog/blob/master/popup-dialog-example/App.js)
 
 
-## Usage
-```javascript
-import PopupDialog from 'react-native-popup-dialog';
+## Basic Usage
+```jsx
+import Dialog, { DialogContent } from 'react-native-popup-dialog';
+import { Button } from 'react-native'
 
 <View style={styles.container}>
   <Button
-    text="Show Dialog"
+    title="Show Dialog"
     onPress={() => {
-      this.popupDialog.show();
+      this.setState({ visible: true });
     }}
   />
-  <PopupDialog
-    ref={(popupDialog) => { this.popupDialog = popupDialog; }}
+  <Dialog
+    visible={this.state.visible}
+    onTouchOutside={() => {
+      this.setState({ visible: false });
+    }}
   >
-    <View>
-      <Text>Hello</Text>
-    </View>
-  </PopupDialog>
+    <DialogContent>
+      {...}
+    </DialogContent>
+  </Dialog>
 </View>
 ```
 
-## Usage - With Animation
-```javascript
-import PopupDialog, { SlideAnimation } from 'react-native-popup-dialog';
+## Usage - Animation
+```jsx
+import Dialog, { SlideAnimation, DialogContent } from 'react-native-popup-dialog';
 
 <View style={styles.container}>
-  <PopupDialog
-    ref={(popupDialog) => { this.popupDialog = popupDialog; }}
-    dialogAnimation = { new SlideAnimation({ slideFrom: 'bottom' }) }
+  <Dialog
+    visible={this.state.visible}
+    dialogAnimation={new SlideAnimation({
+      slideFrom: 'bottom',
+    })}
   >
-    <View>
-      <Text>Hello</Text>
-    </View>
-  </PopupDialog>
+    <DialogContent>
+      {...}
+    </DialogContent>
+  </Dialog>
 </View>
 ```
 
-## Usage - With Dialog Dialog Title
-```javascript
-import PopupDialog, { DialogTitle } from 'react-native-popup-dialog';
+## Usage - Dialog Dialog Title
+```jsx
+import Dialog, { DialogTitle, DialogContent } from 'react-native-popup-dialog';
 
 <View style={styles.container}>
-  <PopupDialog
+  <Dialog
+    visible={this.state.visible}
     dialogTitle={<DialogTitle title="Dialog Title" />}
-    ref={(popupDialog) => { this.popupDialog = popupDialog; }}
   >
-    <View>
-      <Text>Hello</Text>
-    </View>
-  </PopupDialog>
+    <DialogContent>
+      {...}
+    </DialogContent>
+  </Dialog>
 </View>
 ```
 
-## Methods
-#### show
-```javascript
-this.popupDialog.show(() => {
-  console.log('callback');
-});
+## Usage - Dialog Action
+```jsx
+import Dialog, { DialogFooter, DialogButton, DialogContent } from 'react-native-popup-dialog';
+
+<View style={styles.container}>
+  <Dialog
+    visible={this.state.visible}
+    footer={
+      <DialogFooter>
+        <DialogButton
+          text="CANCEL"
+          onPress={() => {}}
+        />
+        <DialogButton
+          text="OK"
+          onPress={() => {}}
+        />
+      </DialogFooter>
+    }
+  >
+    <DialogContent>
+      {...}
+    </DialogContent>
+  </Dialog>
+</View>
 ```
 
-#### dismiss
-```javascript
-this.popupDialog.dismiss(() => {
-  console.log('callback');
-});
-```
 
 ## Props
 
-### PopupDialog
+### Dialog
 | Prop | Type | Default | Note |
 |---|---|---|---|
+| `visible` | `boolean` | `false` | |
+| `rounded` | `boolean` | `true` | |
+| `useNativeDriver` | `boolean` | `true` | |
+| `children` | `any` | | |
 | `dialogTitle?` | `React Element` | | You can pass a `DialogTitle` component or pass a `View` for customizing titlebar |
-| `width?` | `Number` | Your device width | The Width of Dialog, you can use fixed width or use percentage
-| `height?` | `Number` | 300 | The Width of Dialog, you can use fixed height or use percentage
+| `width?` | `Number` | Your device width | The Width of Dialog, you can use fixed width or use percentage. For example `0.5` it means `50%`
+| `height?` | `Number` | 300 | The Height of Dialog, you can use fixed height or use percentage. For example `0.5` it means `50%`
 | `dialogAnimation?` |  | `FadeAnimation` | animation for dialog | |
 | `dialogStyle?` | `any` | | | |
+| `containerStyle?` | `any` | `null` | For example: ``` {  zIndex: 10, elevation: 10 } ``` | |
 | `animationDuration?` | `Number` | `200` | | |
 | `overlayPointerEvents?` | `String` | | Available option: `auto`, `none` |
 | `overlayBackgroundColor?` | `String` | `#000` |
 | `overlayOpacity?` | `Number` | `0.5` |
-| `dismissOnTouchOutside?` | `Bool` | `true` | When touch overlay will dismiss dialog, but if `haveOverlay?` is false then the `dismissOnTouchOutside` won't work| |
-| `dismissOnHardwareBackPress?` | `Bool` | `true` | Only for Android | |
-| `haveOverlay?` | `Bool` | `true` | If false won't show overlay while dialog show | |
-| `show?` | `Bool` | `false` |  | |
-| `onShown?` | `Function` | | You can pass shown function as a callback function, will call the function when dialog shown | |
-| `onDismissed?` | `Function` | | You can pass onDismissed function as a callback function, will call the function when dialog dismissed | |
-| `actions?` | `Array` | | Array of `DialogButton` component for example: ```[<DialogButton text="DISMISS", align="center" onPress={this.dismiss}/>]``` | |
+| `hasOverlay?` | `Boolean` | `true` | | |
+| `onShow?` | `Function` | | You can pass shown function as a callback function, will call the function when dialog shown | |
+| `onDismiss?` | `Function` | | You can pass onDismiss function as a callback function, will call the function when dialog dismissed | |
+| `onTouchOutside?` | `Function` | `() => {}` | | |
+| `onHardwareBackPress?` | `Function` | `() => true` | [Handle hardware button presses](https://facebook.github.io/react-native/docs/backhandler) | |
+| `footer?` | `React Element` | `null` | for example: ```<View><Button text="DISMISS" align="center" onPress={() => {}}/></View>``` | |
 
 
 ### DialogTitle
 | Prop | Type | Default | Note |
 |---|---|---|---|
 | `title` | `String` | | | |
-| `titleStyle?` | `any` | | | |
-| `titleTextStyle?` | `any` | | | |
-| `titleAlign?` | `String` | `center` | | |
-| `haveTitleBar?` | `Bool` | `true` | | |
+| `style?` | `any` | `null` | | |
+| `textStyle?` | `any` | `null` | | |
+| `align?` | `String` | `center` | Available option: `left`, `center`, `right` | |
+| `hasTitleBar?` | `Bool` | `true` | | |
+
+
+### DialogContent
+| Prop | Type | Default | Note |
+|---|---|---|---|
+| `children` | `any` | | | |
+| `style?` | `any` | `null` | | |
+
+
+### DialogFooter
+| Prop | Type | Default | Note |
+|---|---|---|---|
+| `children` | `DialogButton` | | | |
+| `bordered?` | `Boolean` | `true` | | |
+| `style?` | `any` | null | | |
 
 
 ### DialogButton
 | Prop | Type | Default | Note |
 |---|---|---|---|
 | `text` | `String` | | | |
-| `align?` | `String` | `center` | The position of the button. Available option: `left`, `center`, `right` | |
-| `onPress?` | `Function` | | | |
-| `buttonStyle?` | `any` | | | |
-| `textStyle?` | `any` | | | |
-| `textContainerStyle?` | `any` | | | |
+| `onPress` | `Function` | | | |
+| `align?` | `String` | `center` | Available option: `left`, `center`, `right` | |
+| `style?` | `any` | `null` | | |
+| `textStyle?` | `any` | `null` | | |
+| `activeOpacity?` | `Number` | `0.6` | | |
 | `disabled?` | `Boolean` | `false` | | |
-| `activeOpacity?` | `Number` | | | |
+| `bordered?` | `Boolean` | `false` | | |
+
+
+### Overlay
+| Prop | Type | Default | Note |
+|---|---|---|---|
+| `visible` | `Boolean` | | | |
+| `opacity` | `Number` | `0.5` | | |
+| `onPress?` | `Function` | | | |
+| `backgroundColor?` | `string` | `#000` | | |
+| `animationDuration?` | `Number` | `200` | | |
+| `pointerEvents?` | `String` | `null` | Available option: `auto`, `none` | |
+| `useNativeDriver?` | `Boolean` | `true` | | |
 
 
 ## Animation
 ### Params for (*)Animation
 
 ### FadeAnimation
+##### Preview:
+<img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/fade-animation.gif" width="200">
+
+##### Example:
+```javascript
+new FadeAnimation({
+  initialValue: 0, // optional
+  animationDuration: 150, // optional
+  useNativeDriver: true, // optional
+})
+```
 | Param | Type | Default | Note |
 |---|---|---|---|
-| `toValue` | Number | 0 | |
-| `animationDuration` | Number | 150 | |
+| `initialValue` | Number | 0 | |
+| `animationDuration?` | Number | 150 | |
+| `useNativeDriver?` | Boolean | true | |
 
 ### ScaleAnimation
+##### Preview:
+<img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/scale-animation.gif" width="200">
+
+##### Example:
+```javascript
+new ScaleAnimation({
+  initialValue: 0, // optional
+  useNativeDriver: true, // optional
+})
+```
 | Param | Type | Default | Note |
 |---|---|---|---|
-| `toValue` | Number | 0 | |
+| `initialValue` | Number | 0 | |
+| `useNativeDriver` | Boolean | true |  |
 
 ### SlideAnimation
+##### Preview:
+<img src="https://raw.githubusercontent.com/jacklam718/react-native-popup-dialog/master/.github/slide-animation.gif" width="200">
+
+##### Example:
+```javascript
+new SlideAnimation({
+  initialValue: 0, // optional
+  slideFrom: 'bottom', // optional
+  useNativeDriver: true, // optional
+})
+```
 | Param | Type | Default | Note |
 |---|---|---|---|
-| `toValue` | Number | 0 | |
+| `initialValue` | Number | 0 | |
 | `slideFrom` | String | `bottom` | Available option: `top`, `bottom`, `left`, `right` |
+| `useNativeDriver` | Boolean | true | |
+
+### Create your custom animation
+
+##### Example:
+
+```javascript
+import { Animated } from 'react-native';
+import { Animation } from 'react-native-popup-dialog';
+
+class CustomAnimation extends Animation {
+  in(onFinished) {
+    Animated.spring(this.animate, {
+      toValue: 1,
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
+  }
+
+  out(onFinished) {
+    Animated.spring(this.animate, {
+      toValue: 0,
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
+  }
+
+  getAnimations() {
+    return {
+      transform: [{
+        translateY: this.animate.interpolate({
+          inputRange: [0, 1],
+          outputRange: [800, 1],
+        }),
+      }],
+    };
+  }
+}
+```
 
 ## Development
 `yarn`
 
 `yarn run build`
+
+`yarn test`

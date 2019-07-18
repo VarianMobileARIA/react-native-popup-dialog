@@ -11,14 +11,11 @@ import {
 } from 'react-native';
 
 import Overlay from './Overlay';
-
+import type { DialogProps } from '../type';
+import Animation from '../animations/Animation';
 import FadeAnimation from '../animations/FadeAnimation';
-import type { DialogType } from '../Type';
 
 const BackHandler = RNBackHandler || RNBackAndroid;
-
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 // dialog states
 const DIALOG_OPENING: string = 'opening';
@@ -28,28 +25,20 @@ const DIALOG_CLOSED: string = 'closed';
 
 // default dialog config
 const DEFAULT_ANIMATION_DURATION: number = 150;
-const DEFAULT_WIDTH: number = screenWidth;
-const DEFAULT_HEIGHT: number = 300;
-const DISMISS_ON_TOUCH_OUTSIDE: boolean = true;
-const DISMISS_ON_HARDWARE_BACK_PRESS: boolean = true;
-const HAVE_OVERLAY: boolean = true;
 
 // event types
-// only for android
 const HARDWARE_BACK_PRESS_EVENT: string = 'hardwareBackPress';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    position: 'absolute',
-    top: 0,
-    left: 0,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
+    elevation: 10,
   },
   dialog: {
-    borderRadius: 8,
+    overflow: 'hidden',
     backgroundColor: '#ffffff',
   },
   hidden: {
@@ -58,162 +47,159 @@ const styles = StyleSheet.create({
     height: 0,
     width: 0,
   },
+  round: {
+    borderRadius: 8,
+  },
 });
 
-class Dialog extends Component {
-  state: {
-    dialogState: string,
-  }
+type DialogState =
+ | typeof DIALOG_OPENING
+ | typeof DIALOG_OPENED
+ | typeof DIALOG_CLOSING
+ | typeof DIALOG_CLOSED
 
-  props: DialogType
+type State = {
+  dialogAnimation: Animation;
+  dialogState: DialogState;
+}
 
+class Dialog extends Component<DialogProps, State> {
   static defaultProps = {
+    rounded: true,
+    dialogTitle: null,
+    visible: false,
+    containerStyle: null,
     animationDuration: DEFAULT_ANIMATION_DURATION,
-    dialogAnimation: new FadeAnimation({ animationDuration: DEFAULT_ANIMATION_DURATION }),
-    width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT,
-    dismissOnTouchOutside: DISMISS_ON_TOUCH_OUTSIDE,
-    dismissOnHardwareBackPress: DISMISS_ON_HARDWARE_BACK_PRESS,
-    haveOverlay: HAVE_OVERLAY,
-    onShown: () => {},
-    onDismissed: () => {},
-    show: false,
+    dialogStyle: null,
+    width: null,
+    height: null,
+    onTouchOutside: () => {},
+    onHardwareBackPress: () => false,
+    hasOverlay: true,
+    overlayOpacity: 0.5,
+    overlayPointerEvents: null,
+    overlayBackgroundColor: '#000',
+    onShow: () => {},
+    onDismiss: () => {},
+    footer: null,
+    useNativeDriver: true,
   }
 
-  constructor(props: DialogType) {
+  constructor(props: DialogProps) {
     super(props);
-    // opened, opening, closed, closing,
+
     this.state = {
+      dialogAnimation: props.dialogAnimation || new FadeAnimation({
+        animationDuration: props.animationDuration,
+      }),
       dialogState: DIALOG_CLOSED,
     };
-
-    (this: any).onOverlayPress = this.onOverlayPress.bind(this);
-    (this: any).hardwareBackEventHandler = this.hardwareBackEventHandler.bind(this);
   }
 
   componentDidMount() {
-    const { show } = this.props;
-
-    if (show) {
+    if (this.props.visible) {
       this.show();
     }
-
-    BackHandler.addEventListener(HARDWARE_BACK_PRESS_EVENT, this.hardwareBackEventHandler);
+    BackHandler.addEventListener(HARDWARE_BACK_PRESS_EVENT, this.onHardwareBackPress);
   }
 
-  hardwareBackEventHandler(): boolean {
-    const { dismissOnHardwareBackPress } = this.props;
-    const { dialogState } = this.state;
-
-    if (dismissOnHardwareBackPress && dialogState === DIALOG_OPENED) {
-      this.dismiss();
-      return true;
-    }
-    return false;
-  }
-
-  componentWillReceiveProps(nextProps: DialogType) {
-    if (this.props.show !== nextProps.show) {
-      if (nextProps.show) {
+  componentDidUpdate(prevProps: DialogProps) {
+    if (this.props.visible !== prevProps.visible) {
+      if (this.props.visible) {
         this.show();
-      } else {
-        this.dismiss();
+        return;
       }
+      this.dismiss();
     }
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener(HARDWARE_BACK_PRESS_EVENT);
+    BackHandler.removeEventListener(HARDWARE_BACK_PRESS_EVENT, this.onHardwareBackPress);
   }
 
-  onOverlayPress() {
-    const { dismissOnTouchOutside } = this.props;
-
-    if (dismissOnTouchOutside) {
-      this.dismiss();
-    }
-  }
-
-  setDialogState(toValue: number, callback?: Function = () => {}) {
-    let dialogState = toValue ? DIALOG_OPENING : DIALOG_CLOSING;
-
-    // to make sure has passed the dialogAnimation prop and the dialogAnimation has toValue method
-    if (this.props.dialogAnimation && this.props.dialogAnimation.toValue) {
-      this.props.dialogAnimation.toValue(toValue);
-    }
-
-    this.setState({ dialogState });
-
-    setTimeout(() => {
-      dialogState = dialogState === DIALOG_CLOSING ? DIALOG_CLOSED : DIALOG_OPENED;
-      this.setState({ dialogState });
-      callback();
-    }, this.props.animationDuration);
-  }
-
-  show() {
-    const { onShown } = this.props;
-    this.setDialogState(1, onShown);
-  }
-
-  dismiss() {
-    const { onDismissed } = this.props;
-    this.setDialogState(0, onDismissed);
-  }
+  onHardwareBackPress = (): boolean => this.props.onHardwareBackPress();
 
   get pointerEvents(): string {
-    if (this.props.overlayPointerEvents) {
-      return this.props.overlayPointerEvents;
+    const { overlayPointerEvents } = this.props;
+    const { dialogState } = this.state;
+    if (overlayPointerEvents) {
+      return overlayPointerEvents;
     }
-    return this.state.dialogState === DIALOG_OPENED ? 'auto' : 'none';
+    return dialogState === DIALOG_OPENED ? 'auto' : 'none';
   }
 
   get dialogSize(): Object {
+    const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
     let { width, height } = this.props;
-
     if (width && width > 0.0 && width <= 1.0) {
       width *= screenWidth;
     }
     if (height && height > 0.0 && height <= 1.0) {
       height *= screenHeight;
     }
-
     return { width, height };
   }
 
+  show(): void {
+    this.setState({ dialogState: DIALOG_OPENING }, () => {
+      this.state.dialogAnimation.in(() => {
+        this.setState({ dialogState: DIALOG_OPENED }, this.props.onShow);
+      });
+    });
+  }
+
+  dismiss(): void {
+    this.setState({ dialogState: DIALOG_CLOSING }, () => {
+      this.state.dialogAnimation.out(() => {
+        this.setState({ dialogState: DIALOG_CLOSED }, this.props.onDismiss);
+      });
+    });
+  }
+
   render() {
-    const dialogState = this.state.dialogState;
-    const overlayPointerEvents = this.pointerEvents;
-    const dialogSize = this.dialogSize;
+    const { dialogState, dialogAnimation } = this.state;
+    const {
+      rounded,
+      dialogTitle,
+      children,
+      onTouchOutside,
+      hasOverlay,
+      dialogStyle,
+      animationDuration,
+      overlayOpacity,
+      useNativeDriver,
+      overlayBackgroundColor,
+      containerStyle,
+      footer,
+    } = this.props;
+
+    const overlayVisible = hasOverlay && [DIALOG_OPENING, DIALOG_OPENED].includes(dialogState);
+    const round = rounded ? styles.round : null;
     const hidden = dialogState === DIALOG_CLOSED && styles.hidden;
-    const isShowOverlay = (
-      [DIALOG_OPENING, DIALOG_OPENED].includes(dialogState) && this.props.haveOverlay
-    );
-    const dimensions = {
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height,
-    };
 
     return (
-      <View style={[styles.container, hidden, dimensions]}>
+      <View style={[styles.container, hidden, containerStyle]}>
         <Overlay
-          pointerEvents={overlayPointerEvents}
-          showOverlay={isShowOverlay}
-          onPress={this.onOverlayPress}
-          backgroundColor={this.props.overlayBackgroundColor}
-          opacity={this.props.overlayOpacity}
-          animationDuration={this.props.animationDuration}
+          pointerEvents={this.pointerEvents}
+          visible={overlayVisible}
+          onPress={onTouchOutside}
+          backgroundColor={overlayBackgroundColor}
+          opacity={overlayOpacity}
+          animationDuration={animationDuration}
+          useNativeDriver={useNativeDriver}
         />
         <Animated.View
           style={[
             styles.dialog,
-            dialogSize,
-            this.props.dialogStyle,
-            this.props.dialogAnimation.animations,
+            round,
+            this.dialogSize,
+            dialogStyle,
+            dialogAnimation.getAnimations(),
           ]}
         >
-          {this.props.children}
-          {this.props.actions}
+          {dialogTitle}
+          {children}
+          {footer}
         </Animated.View>
       </View>
     );

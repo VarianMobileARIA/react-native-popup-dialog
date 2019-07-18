@@ -1,31 +1,41 @@
-/* @flow */
+// @flow
 
 import { Animated } from 'react-native';
-import Animation from './Animation';
+import Animation, { type AnimationConfig } from './Animation';
 
-type Param = {
-  toValue?: number,
+type FadeAnimationConfig = AnimationConfig & {
   animationDuration?: number,
 }
 
 export default class FadeAnimation extends Animation {
-  animate: Object
   animationDuration: number
 
-  constructor({ toValue = 0, animationDuration = 200 }: Param) {
-    super(toValue);
-
+  constructor({
+    initialValue = 0,
+    useNativeDriver = true,
+    animationDuration = 200,
+  }: FadeAnimationConfig = {}) {
+    super({ initialValue, useNativeDriver });
     this.animationDuration = animationDuration;
   }
 
-  toValue(toValue: number) {
+  in(onFinished?: Function = () => {}): void {
     Animated.timing(this.animate, {
-      toValue,
+      toValue: 1,
       duration: this.animationDuration,
-    }).start();
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
   }
 
-  createAnimations(): Object {
+  out(onFinished?: Function = () => {}): void {
+    Animated.timing(this.animate, {
+      toValue: 0,
+      duration: this.animationDuration,
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
+  }
+
+  getAnimations(): Object {
     return { opacity: this.animate };
   }
 }

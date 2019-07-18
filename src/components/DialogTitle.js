@@ -1,45 +1,47 @@
 // @flow
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform, PixelRatio } from 'react-native';
 import { Positions } from '../constants/Constants';
+import type { DialogTitleProps } from '../type';
 
-import type { DialogTitleType } from '../Type';
-
-const DEFAULT_TITLE_ALIGN: string = 'center';
-const HAVE_TITLE_BAR: boolean = true;
+const isAndroid = Platform.OS === 'android';
 
 const styles = StyleSheet.create({
   title: {
     padding: 24,
+    paddingLeft: 18,
+    paddingRight: 18,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
   titleBar: {
     padding: 14,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1 / PixelRatio.get(),
     backgroundColor: '#F9F9FB',
     borderColor: '#DAD9DC',
   },
-  titleText: {
-    color: '#7F7D89',
-    fontSize: 16,
+  text: {
+    fontWeight: isAndroid ? '400' : '500',
+    fontFamily: isAndroid ? 'sans-serif-medium' : 'System',
+    fontSize: isAndroid ? 19 : 15,
+    color: '#151822',
   },
 });
 
 function DialogTitle({
   title,
-  titleStyle,
-  titleTextStyle,
-  haveTitleBar,
-  titleAlign,
-}: DialogTitleType) {
-  const titleBar = haveTitleBar ? styles.titleBar : null;
-  const titleItemsAlign = { alignItems: Positions[titleAlign] };
+  style,
+  textStyle,
+  hasTitleBar,
+  align,
+}: DialogTitleProps) {
+  const titleBar = hasTitleBar ? styles.titleBar : null;
+  const titleAlign = { alignItems: Positions[align] };
 
   return (
-    <View style={[styles.title, titleItemsAlign, titleBar, titleStyle]}>
-      <Text style={[styles.titleText, titleTextStyle]}>
+    <View style={[styles.title, titleAlign, titleBar, style]}>
+      <Text style={[styles.text, textStyle]}>
         {title}
       </Text>
     </View>
@@ -47,8 +49,10 @@ function DialogTitle({
 }
 
 DialogTitle.defaultProps = {
-  titleAlign: DEFAULT_TITLE_ALIGN,
-  haveTitleBar: HAVE_TITLE_BAR,
+  align: 'center',
+  style: null,
+  textStyle: null,
+  hasTitleBar: true,
 };
 
 export default DialogTitle;

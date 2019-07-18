@@ -1,52 +1,35 @@
-// flow
+// @flow
 
 import { Animated } from 'react-native';
 import Animation from './Animation';
 
 export default class ScaleAnimation extends Animation {
-  toValue(toValue: number, onFinished: ?Function) {
-    switch (toValue) {
-      case 0:
-        Animated.spring(this.animate, {
-          toValue,
-          velocity: 3,
-          tension: 250,
-          friction: 20,
-        }).start(onFinished);
-        break;
-      case 1:
-        Animated.spring(this.animate, {
-          toValue,
-          velocity: 0,
-          tension: 65,
-          friction: 7,
-        }).start(onFinished);
-        break;
-      default:
-        break;
-    }
+  in(onFinished?: Function = () => {}): void {
+    Animated.spring(this.animate, {
+      toValue: 1,
+      velocity: 0,
+      tension: 65,
+      friction: 7,
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
   }
 
-  createAnimations(): Object {
-    const transform = [
-      {
-        scale: this.animate.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, 1],
-        }),
-      },
-      {
-        scale: this.animate.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, 1],
-        }),
-      },
-    ];
+  out(onFinished?: Function = () => {}): void {
+    Animated.timing(this.animate, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
+  }
 
-    const animations = {
-      transform,
+  getAnimations(): Object {
+    return {
+      transform: [{
+        scale: this.animate.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+        }),
+      }],
     };
-
-    return animations;
   }
 }

@@ -1,69 +1,92 @@
-/* @flow */
+// @flow
 
-import { Animated } from 'react-native';
-import Animation from './Animation';
+import { Animated, Dimensions } from 'react-native';
+import Animation, { type AnimationConfig } from './Animation';
 
-type Param = {
-  toValue: number,
-  slideFrom: string,
+const {
+  width: SCREEN_WIDTH,
+  height: SCREEN_HEIGHT,
+} = Dimensions.get('window');
+
+type SlideFrom = 'top' | 'bottom' | 'left' | 'right';
+type SlideAnimationConfig = AnimationConfig & {
+  slideFrom?: SlideFrom,
 }
 
 export default class SlideAnimation extends Animation {
-  constructor({ toValue = 0, slideFrom = 'bottom' }: Param) {
-    super(toValue);
-    this.animations = this.createAnimations(slideFrom);
+  slideFrom: SlideFrom;
+
+  static SLIDE_FROM_TOP = 'top';
+  static SLIDE_FROM_BOTTOM = 'bottom';
+  static SLIDE_FROM_LEFT = 'left';
+  static SLIDE_FROM_RIGHT = 'right';
+
+  constructor({
+    initialValue = 0,
+    useNativeDriver = true,
+    slideFrom = SlideAnimation.SLIDE_FROM_BOTTOM,
+  }: SlideAnimationConfig = {}) {
+    super({ initialValue, useNativeDriver });
+    this.slideFrom = slideFrom;
   }
 
-  toValue(toValue: number, onFinished: ?Function) {
+  in(onFinished?: Function = () => {}): void {
     Animated.spring(this.animate, {
-      toValue,
+      toValue: 1,
       velocity: 0,
       tension: 65,
       friction: 10,
+      useNativeDriver: this.useNativeDriver,
     }).start(onFinished);
   }
 
-  createAnimations(slideFrom: string): Object {
+  out(onFinished?: Function = () => {}): void {
+    Animated.spring(this.animate, {
+      toValue: 0,
+      velocity: 0,
+      tension: 65,
+      friction: 10,
+      useNativeDriver: this.useNativeDriver,
+    }).start(onFinished);
+  }
+
+  getAnimations(): Object {
     const transform = [];
-
-    if (['top', 'bottom'].includes(slideFrom)) {
-      if (slideFrom === 'bottom') {
-        transform.push({
-          translateY: this.animate.interpolate({
-            inputRange: [0, 1],
-            outputRange: [800, 1],
-          }),
-        });
-      } else {
-        transform.push({
-          translateY: this.animate.interpolate({
-            inputRange: [0, 1],
-            outputRange: [-800, 1],
-          }),
-        });
-      }
-    } else if (['left', 'right'].includes(slideFrom)) {
-      if (slideFrom === 'right') {
-        transform.push({
-          translateX: this.animate.interpolate({
-            inputRange: [0, 1],
-            outputRange: [800, 1],
-          }),
-        });
-      } else {
-        transform.push({
-          translateX: this.animate.interpolate({
-            inputRange: [0, 1],
-            outputRange: [-800, 1],
-          }),
-        });
-      }
+    if (this.slideFrom === SlideAnimation.SLIDE_FROM_TOP) {
+      transform.push({
+        translateY: this.animate.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-SCREEN_HEIGHT, 0],
+        }),
+      });
+    } else if (this.slideFrom === SlideAnimation.SLIDE_FROM_BOTTOM) {
+      transform.push({
+        translateY: this.animate.interpolate({
+          inputRange: [0, 1],
+          outputRange: [SCREEN_HEIGHT, 0],
+        }),
+      });
+    } else if (this.slideFrom === SlideAnimation.SLIDE_FROM_LEFT) {
+      transform.push({
+        translateX: this.animate.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-SCREEN_WIDTH, 0],
+        }),
+      });
+    } else if (this.slideFrom === SlideAnimation.SLIDE_FROM_RIGHT) {
+      transform.push({
+        translateX: this.animate.interpolate({
+          inputRange: [0, 1],
+          outputRange: [SCREEN_WIDTH, 0],
+        }),
+      });
+    } else {
+      throw new Error(`
+        slideFrom: ${this.slideFrom} not supported. 'slideFrom' must be 'top' | 'bottom' | 'left' | 'right'
+      `);
     }
-
-    const animations = {
+    return {
       transform,
     };
-
-    return animations;
   }
 }
